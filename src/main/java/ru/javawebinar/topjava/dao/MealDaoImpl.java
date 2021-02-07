@@ -12,30 +12,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealDaoImpl implements MealDao {
 
-    private static final AtomicInteger mealCount = new AtomicInteger();
-    private static final Map<Integer, Meal> mealMap = new ConcurrentHashMap<>();
+    private final AtomicInteger mealCount = new AtomicInteger();
+    private final Map<Integer, Meal> mealMap = new ConcurrentHashMap<>();
 
-    static {
-        int id = mealCount.getAndIncrement();
-        mealMap.put(id,  new Meal(id, LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
-        id = mealCount.getAndIncrement();
-        mealMap.put(id,  new Meal(id, LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000));
-        id = mealCount.getAndIncrement();
-        mealMap.put(id,  new Meal(id, LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500));
-        id = mealCount.getAndIncrement();
-        mealMap.put(id,  new Meal(id, LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100));
-        id = mealCount.getAndIncrement();
-        mealMap.put(id,  new Meal(id, LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000));
-        id = mealCount.getAndIncrement();
-        mealMap.put(id,  new Meal(id, LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500));
-        id = mealCount.getAndIncrement();
-        mealMap.put(id,  new Meal(id, LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410));
+     {
+        create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
+        create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000));
+        create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500));
+        create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100));
+        create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000));
+        create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500));
+        create(new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410));
     }
 
     @Override
-    public void create(LocalDateTime dateTime, String description, int calories) {
+    public Meal create(Meal meal) {
         int id = mealCount.getAndIncrement();
-        mealMap.put(id, new Meal(id, dateTime, description, calories));
+        meal.setId(id);
+        return mealMap.put(id, meal);
     }
 
     @Override
@@ -49,8 +43,8 @@ public class MealDaoImpl implements MealDao {
     }
 
     @Override
-    public void update(int id, LocalDateTime dateTime, String description, int calories) {
-        mealMap.put(id, new Meal(id, dateTime, description, calories));
+    public Meal update(Meal meal) {
+        return mealMap.put(meal.getId(), meal);
     }
 
     @Override

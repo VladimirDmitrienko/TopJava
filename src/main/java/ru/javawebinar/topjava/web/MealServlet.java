@@ -3,6 +3,7 @@ package ru.javawebinar.topjava.web;
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.dao.MealDao;
 import ru.javawebinar.topjava.dao.MealDaoImpl;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -23,16 +24,17 @@ public class MealServlet extends HttpServlet {
     private static final int CALORIES_LIMIT = 2000;
     private static final String CREATE_OR_UPDATE = "createOrUpdateMeal.jsp";
     private static final String LIST = "meals.jsp";
+    private static final String SERVLET_URL = "meals";
 
     private final MealDao mealDao = new MealDaoImpl();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");
+        String action;
 
-        if (action.equalsIgnoreCase("list")) {
-            processListAction(request, response);
+        if ((action = request.getParameter("action")) == null) {
+            listMeals(request, response);
         }
         else if (action.equalsIgnoreCase("createOrUpdate")) {
             processCreateOrUpdateAction(request, response);
@@ -40,18 +42,22 @@ public class MealServlet extends HttpServlet {
         else if (action.equalsIgnoreCase("delete")) {
             processDeleteAction(request, response);
         }
+        else {
+            listMeals(request, response);
+        }
     }
 
-    private void processListAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void listMeals(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("meals", getMealToList());
         log.debug("forward to meals");
         request.getRequestDispatcher(LIST).forward(request, response);
     }
 
-    private void processDeleteAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void processDeleteAction(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         mealDao.delete(id);
-        processListAction(request, response);
+        log.debug("redirect to meals");
+        response.sendRedirect(SERVLET_URL);
     }
 
     private void processCreateOrUpdateAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -71,23 +77,27 @@ public class MealServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         req.setCharacterEncoding("UTF-8");
-        String action = req.getParameter("action");
 
-        if (action.equalsIgnoreCase("createOrUpdate")) {
-            int id = req.getParameter("id").isEmpty() ? -1 : Integer.parseInt(req.getParameter("id"));
-            String description = req.getParameter("description");
-            int calories = Integer.parseInt(req.getParameter("calories"));
-            LocalDateTime dateTime = LocalDateTime.parse(req.getParameter("dateTime"));
+        int id = req.getParameter("id").isEmpty() ? -1 : Integer.parseInt(req.getParameter("id"));
+        String description = req.getParameter("description");
+        int calories = Integer.parseInt(req.getParameter("calories"));
+        LocalDateTime dateTime = LocalDateTime.parse(req.getParameter("dateTime"));
+        Meal meal = new Meal(dateTime, description, calories);
 
-            if (id == -1) {
-                mealDao.create(dateTime, description, calories);
-            }
-            else {
-                mealDao.update(id, dateTime, description, calories);
+        if (id == -1) {
+            mealDao.create(meal);
+        }
+        else {
+            Meal mealForUpdate = mealDao.get(id);
+            if (mealForUpdate != null) {
+                meal.setId(id);
+                if (!mealForUpdate.equals(meal)) {
+                    mealDao.update(meal);
+                }
             }
         }
-        processListAction(req, resp);
+        resp.sendRedirect(SERVLET_URL);
     }
 }
