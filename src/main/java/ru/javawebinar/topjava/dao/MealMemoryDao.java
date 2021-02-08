@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MealDaoImpl implements MealDao {
+public class MealMemoryDao implements MealDao {
 
     private final AtomicInteger mealCount = new AtomicInteger();
     private final Map<Integer, Meal> mealMap = new ConcurrentHashMap<>();
@@ -29,7 +29,8 @@ public class MealDaoImpl implements MealDao {
     public Meal create(Meal meal) {
         int id = mealCount.getAndIncrement();
         meal.setId(id);
-        return mealMap.put(id, meal);
+        mealMap.put(id, meal);
+        return meal;
     }
 
     @Override
@@ -44,7 +45,8 @@ public class MealDaoImpl implements MealDao {
 
     @Override
     public Meal update(Meal meal) {
-        return mealMap.put(meal.getId(), meal);
+        mealMap.computeIfPresent(meal.getId(), (k, v) -> meal);
+        return meal;
     }
 
     @Override

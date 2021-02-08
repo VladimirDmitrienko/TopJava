@@ -23,7 +23,7 @@
     <a href="index.html">Home</a>
 </h3>
 <hr>
-<h2>Edit meal</h2>
+<h2><c:out value="${action}"/></h2>
 
 <form method="POST" action='meals' name="createOrUpdateForm">
     <label for="dateTime">DateTime:</label>
