@@ -14,6 +14,18 @@
         .excess {
             color: red;
         }
+        input {
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+        button {
+            margin-left: 6px;
+            cursor: pointer;
+            padding: 5px 16px;
+            text-align: center;
+            font-size: 14px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
@@ -32,6 +44,14 @@
             <th></th>
             <th></th>
         </tr>
+        <form method="get" action="meals">
+            <input name="action" type="hidden" value="filter">
+            <input name="startDate" type="date" value="${startDate}">
+            <input name="endDate" type="date" value="${endDate}">
+            <input name="startTime" type="time" value="${startTime}">
+            <input name="endTime" type="time" value="${endTime}">
+            <button type="submit">Filter</button>
+        </form>
         </thead>
         <c:forEach items="${meals}" var="meal">
             <jsp:useBean id="meal" type="ru.javawebinar.topjava.to.MealTo"/>

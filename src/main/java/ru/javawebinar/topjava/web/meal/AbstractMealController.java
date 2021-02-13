@@ -8,6 +8,9 @@ import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.SecurityUtil;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
@@ -51,7 +54,17 @@ public abstract class AbstractMealController {
     public void update(Meal meal, int id) {
         assureIdConsistent(meal, id);
         int userId = SecurityUtil.authUserId();
+        meal.setUserId(userId);
         log.info("update {} for user {}", meal.getId(), userId);
         service.update(meal, userId);
+    }
+
+    public List<MealTo> getBetween(LocalDate startDate, LocalDate endDate,
+                                   LocalTime startTime, LocalTime endTime) {
+        int userId = SecurityUtil.authUserId();
+        log.info("getAll between dates: {} {} and time {} {} for user {}",
+                startDate, endDate, startTime, endTime, userId);
+        Collection<Meal> mealsFilteredByDate = service.getBetweenInclusive(userId, startDate, endDate);
+        return MealsUtil.getFilteredTos(mealsFilteredByDate, SecurityUtil.authUserCaloriesPerDay(), startTime, endTime);
     }
 }
