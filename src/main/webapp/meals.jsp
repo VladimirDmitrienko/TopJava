@@ -46,10 +46,10 @@
         </tr>
         <form method="get" action="meals">
             <input name="action" type="hidden" value="filter">
-            <input name="startDate" type="date" value="${startDate}">
-            <input name="endDate" type="date" value="${endDate}">
-            <input name="startTime" type="time" value="${startTime}">
-            <input name="endTime" type="time" value="${endTime}">
+            <input name="startDate" type="date" value="${param.startDate}">
+            <input name="endDate" type="date" value="${param.endDate}">
+            <input name="startTime" type="time" value="${param.startTime}">
+            <input name="endTime" type="time" value="${param.endTime}">
             <button type="submit">Filter</button>
         </form>
         </thead>

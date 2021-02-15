@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.web.meal.AbstractMealController;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletException;
@@ -22,7 +21,7 @@ import java.util.Objects;
 public class MealServlet extends HttpServlet {
     private static final Logger log = LoggerFactory.getLogger(MealServlet.class);
 
-    private AbstractMealController mealController;
+    private MealRestController mealController;
     private ConfigurableApplicationContext appCtx;
 
     @Override
@@ -59,10 +58,6 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        if (request.getParameter("userId") != null) {
-            int userId = Integer.parseInt(request.getParameter("userId"));
-            SecurityUtil.setAuthUserId(userId);
-        }
 
         switch (action == null ? "all" : action) {
             case "delete":
@@ -93,22 +88,14 @@ public class MealServlet extends HttpServlet {
 
     private void processFilterAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         LocalDate startDate = request.getParameter("startDate").isEmpty() ?
-                LocalDate.MIN : LocalDate.parse(request.getParameter("startDate"));
-        request.setAttribute("startDate", startDate);
-
+                null : LocalDate.parse(request.getParameter("startDate"));
         LocalDate endDate = request.getParameter("endDate").isEmpty() ?
-                LocalDate.MAX : LocalDate.parse(request.getParameter("endDate"));
-        request.setAttribute("endDate", endDate);
-
+                null : LocalDate.parse(request.getParameter("endDate"));
         LocalTime startTime = request.getParameter("startTime").isEmpty() ?
-                LocalTime.MIN : LocalTime.parse(request.getParameter("startTime"));
-        request.setAttribute("startTime", startTime);
-
+                null : LocalTime.parse(request.getParameter("startTime"));
         LocalTime endTime = request.getParameter("endTime").isEmpty() ?
-                LocalTime.MAX : LocalTime.parse(request.getParameter("endTime"));
-        request.setAttribute("endTime", endTime);
+                null : LocalTime.parse(request.getParameter("endTime"));
 
-        log.info("getAll between dates: {} {} and time {} {}", startDate, endDate, startTime, endTime);
         request.setAttribute("meals", mealController.getBetween(startDate, endDate, startTime, endTime));
         request.getRequestDispatcher("/meals.jsp").forward(request, response);
     }
