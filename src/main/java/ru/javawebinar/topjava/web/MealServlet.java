@@ -87,14 +87,21 @@ public class MealServlet extends HttpServlet {
     }
 
     private void processFilterAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LocalDate startDate = request.getParameter("startDate").isEmpty() ?
-                null : LocalDate.parse(request.getParameter("startDate"));
-        LocalDate endDate = request.getParameter("endDate").isEmpty() ?
-                null : LocalDate.parse(request.getParameter("endDate"));
-        LocalTime startTime = request.getParameter("startTime").isEmpty() ?
-                null : LocalTime.parse(request.getParameter("startTime"));
-        LocalTime endTime = request.getParameter("endTime").isEmpty() ?
-                null : LocalTime.parse(request.getParameter("endTime"));
+        String paramStrValue = request.getParameter("startDate");
+        LocalDate startDate = (paramStrValue == null || paramStrValue.isEmpty()) ?
+                null : LocalDate.parse(paramStrValue);
+
+        paramStrValue = request.getParameter("endDate");
+        LocalDate endDate = (paramStrValue == null || paramStrValue.isEmpty()) ?
+                null : LocalDate.parse(paramStrValue);
+
+        paramStrValue = request.getParameter("startTime");
+        LocalTime startTime = (paramStrValue == null || paramStrValue.isEmpty()) ?
+                null : LocalTime.parse(paramStrValue);
+
+        paramStrValue = request.getParameter("endTime");
+        LocalTime endTime = (paramStrValue == null || paramStrValue.isEmpty()) ?
+                null : LocalTime.parse(paramStrValue);
 
         request.setAttribute("meals", mealController.getBetween(startDate, endDate, startTime, endTime));
         request.getRequestDispatcher("/meals.jsp").forward(request, response);

@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -29,46 +28,40 @@ public class InMemoryMealRepository implements MealRepository {
     public Meal save(Meal meal, int userId) {
         if (meal.isNew()) {
             meal.setId(counter.incrementAndGet());
-            meal.setUserId(userId);
-            repository.merge(userId, new ConcurrentHashMap<Integer, Meal>() {{ put(meal.getId(), meal);}},
-                    (oldMap, newMap) -> {
-                oldMap.putAll(newMap);
-                return oldMap; });
+            repository.computeIfAbsent(userId, (id) -> {
+                repository.put(userId, new ConcurrentHashMap<Integer, Meal>() {{ put(meal.getId(), meal);}});
+                return repository.get(userId);
+            }).putIfAbsent(meal.getId(), meal);
             return meal;
         }
-        AtomicReference<Meal> computedMeal = new AtomicReference<>();
-        repository.computeIfPresent(userId, (id, map) -> {
-            computedMeal.set(map.computeIfPresent(meal.getId(), (mealId, oldMeal) -> meal));
-            return map;
-        });
-        return computedMeal.get();
+        return repository.get(userId).computeIfPresent(meal.getId(), (id, oldUser) -> meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        return repository.getOrDefault(userId, Collections.emptyMap()).remove(id) != null;
+        return repository.get(userId).remove(id) != null;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        return repository.getOrDefault(userId, Collections.emptyMap()).get(id);
+        return repository.get(userId).get(id);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        Collection<Meal> meals = repository.getOrDefault(userId, Collections.emptyMap()).values();
-        if (meals.isEmpty()) {
-            return new ArrayList<>(meals);
+        Map<Integer, Meal> meals = repository.get(userId);
+        if (meals == null) {
+            return filterByPredicate(Collections.emptyList(), meal -> true);
         }
-        return filterByPredicate(meals, meal -> true);
+        return filterByPredicate(meals.values(), meal -> true);
     }
 
     public List<Meal> getBetweenInclusive(int userId, LocalDate startDate, LocalDate endDate) {
-        Collection<Meal> meals = repository.getOrDefault(userId, Collections.emptyMap()).values();
-        if (meals.isEmpty()) {
-            return new ArrayList<>(meals);
+        Map<Integer, Meal> meals = repository.get(userId);
+        if (meals == null) {
+            return filterByPredicate(Collections.emptyList(), meal -> true);
         }
-        return filterByPredicate(meals, meal -> DateTimeUtil.isBetweenInclusive(meal.getDate(), startDate, endDate));
+        return filterByPredicate(meals.values(), meal -> DateTimeUtil.isBetweenInclusive(meal.getDate(), startDate, endDate));
     }
 
     private List<Meal> filterByPredicate(Collection<Meal> meals, Predicate<Meal> filter) {
