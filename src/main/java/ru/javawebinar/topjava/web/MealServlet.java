@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.util.StringUtils;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
@@ -88,20 +89,20 @@ public class MealServlet extends HttpServlet {
 
     private void processFilterAction(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String paramStrValue = request.getParameter("startDate");
-        LocalDate startDate = (paramStrValue == null || paramStrValue.isEmpty()) ?
-                null : LocalDate.parse(paramStrValue);
+        LocalDate startDate = (StringUtils.hasText(paramStrValue)) ?
+                LocalDate.parse(paramStrValue) : null;
 
         paramStrValue = request.getParameter("endDate");
-        LocalDate endDate = (paramStrValue == null || paramStrValue.isEmpty()) ?
-                null : LocalDate.parse(paramStrValue);
+        LocalDate endDate = (StringUtils.hasText(paramStrValue)) ?
+                LocalDate.parse(paramStrValue) : null;
 
         paramStrValue = request.getParameter("startTime");
-        LocalTime startTime = (paramStrValue == null || paramStrValue.isEmpty()) ?
-                null : LocalTime.parse(paramStrValue);
+        LocalTime startTime = (StringUtils.hasText(paramStrValue)) ?
+                LocalTime.parse(paramStrValue) : null;
 
         paramStrValue = request.getParameter("endTime");
-        LocalTime endTime = (paramStrValue == null || paramStrValue.isEmpty()) ?
-                null : LocalTime.parse(paramStrValue);
+        LocalTime endTime = (StringUtils.hasText(paramStrValue)) ?
+                LocalTime.parse(paramStrValue) : null;
 
         request.setAttribute("meals", mealController.getBetween(startDate, endDate, startTime, endTime));
         request.getRequestDispatcher("/meals.jsp").forward(request, response);
