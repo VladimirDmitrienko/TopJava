@@ -25,23 +25,23 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 
 @ContextConfiguration({
-        "classpath:spring/spring-app.xml",
+        "classpath:spring/spring-app.xml", "classpath:spring/spring-app-jdbc.xml",
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 public class MealServiceTest {
 
-    @Autowired
-    private MealService mealService;
-
-    public MealServiceTest() {
-    }
-
     static {
         // Only for postgres driver logging
         // It uses java.util.logging and logged via jul-to-slf4j bridge
         SLF4JBridgeHandler.install();
+    }
+
+    @Autowired
+    private MealService mealService;
+
+    public MealServiceTest() {
     }
 
     @Test
@@ -55,8 +55,8 @@ public class MealServiceTest {
     }
 
     @Test
-    public void duplicatedTimeCreate() {
-        LocalDateTime dateTime = getUserMeals().get(0).getDateTime();
+    public void duplicatedDateTimeCreate() {
+        LocalDateTime dateTime = userMeal1.getDateTime();
         Meal newMeal = getNew();
         newMeal.setDateTime(dateTime);
         assertThrows(DuplicateKeyException.class, () -> mealService.create(newMeal, UserTestData.USER_ID));
@@ -64,14 +64,20 @@ public class MealServiceTest {
 
     @Test
     public void get() {
-        Meal meal = mealService.get(getUserMeals().get(0).getId(), UserTestData.USER_ID);
-        assertMatch(meal, getUserMeals().get(0));
+        Meal meal = mealService.get(userMeal1.getId(), UserTestData.USER_ID);
+        assertMatch(meal, userMeal1);
     }
 
     @Test
     public void getNotFound() {
         assertThrows(NotFoundException.class, () ->
-                mealService.get(getUserMeals().get(0).getId(), UserTestData.ADMIN_ID));
+                mealService.get(NON_EXISTENT_MEAL_ID, UserTestData.USER_ID));
+    }
+
+    @Test
+    public void getNotOwn() {
+        assertThrows(NotFoundException.class, () ->
+                mealService.get(userMeal1.getId(), UserTestData.ADMIN_ID));
     }
 
     @Test
@@ -86,6 +92,15 @@ public class MealServiceTest {
     }
 
     @Test
+    public void getBetweenInclusiveWithNull() {
+        List<Meal> userMeals = mealService.getBetweenInclusive(null, null, UserTestData.USER_ID);
+        List<Meal> testMeals = getUserMeals().stream()
+                .filter(meal -> Util.isBetweenHalfOpen(meal.getDate(), null, null))
+                .collect(Collectors.toList());
+        assertMatch(userMeals, testMeals);
+    }
+
+    @Test
     public void getAll() {
         List<Meal> userMeals = mealService.getAll(UserTestData.USER_ID);
         List<Meal> adminMeals = mealService.getAll(UserTestData.ADMIN_ID);
@@ -95,13 +110,13 @@ public class MealServiceTest {
 
     @Test
     public void update() {
+        mealService.update(getUpdated(), UserTestData.USER_ID);
         Meal updated = getUpdated();
-        mealService.update(updated, UserTestData.USER_ID);
-        assertMatch(updated, mealService.get(updated.getId(), UserTestData.USER_ID));
+        assertMatch(mealService.get(updated.getId(), UserTestData.USER_ID), updated);
     }
 
     @Test
-    public void updateNotFound() {
+    public void updateNotOwn() {
         Meal updated = getUpdated();
         assertThrows(NotFoundException.class, () ->
                 mealService.update(updated, UserTestData.ADMIN_ID));
@@ -109,14 +124,14 @@ public class MealServiceTest {
 
     @Test
     public void delete() {
-        mealService.delete(getUserMeals().get(0).getId(), UserTestData.USER_ID);
+        mealService.delete(userMeal1.getId(), UserTestData.USER_ID);
         assertThrows(NotFoundException.class, () ->
-                mealService.delete(getUserMeals().get(0).getId(), UserTestData.USER_ID));
+                mealService.delete(userMeal1.getId(), UserTestData.USER_ID));
     }
 
     @Test
-    public void deletedNotFound() {
+    public void deleteNotOwn() {
         assertThrows(NotFoundException.class, () ->
-                mealService.delete(getUserMeals().get(0).getId(), UserTestData.ADMIN_ID));
+                mealService.delete(userMeal1.getId(), UserTestData.ADMIN_ID));
     }
 }

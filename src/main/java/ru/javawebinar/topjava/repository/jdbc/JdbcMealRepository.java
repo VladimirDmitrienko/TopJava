@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -73,6 +72,6 @@ public class JdbcMealRepository implements MealRepository {
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
         return jdbcTemplate.query("SELECT * FROM meals WHERE user_id=? AND dateTime >= ? AND dateTime < ? " +
-                        "ORDER BY dateTime DESC", ROW_MAPPER, userId, startDateTime, endDateTime);
+                "ORDER BY dateTime DESC", ROW_MAPPER, userId, startDateTime, endDateTime);
     }
 }
