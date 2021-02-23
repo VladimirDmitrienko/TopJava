@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,8 +26,7 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 
 @ContextConfiguration({
-        "classpath:spring/spring-app.xml", "classpath:spring/spring-app-jdbc.xml",
-        "classpath:spring/spring-db.xml"
+        "classpath:spring/spring-app.xml", "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -85,7 +85,10 @@ public class MealServiceTest {
         LocalDate startDate = LocalDate.of(2019, Month.JANUARY, 30);
         LocalDate endDate = LocalDate.of(2020, Month.JANUARY, 30);
         List<Meal> userMeals = mealService.getBetweenInclusive(startDate, endDate, UserTestData.USER_ID);
-        List<Meal> testMeals = getUserMeals().stream()
+        List<Meal> testDataMeals = Arrays.asList(
+                userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1
+        );
+        List<Meal> testMeals = testDataMeals.stream()
                 .filter(meal -> Util.isBetweenHalfOpen(meal.getDate(), startDate, endDate.plus(1, ChronoUnit.DAYS)))
                 .collect(Collectors.toList());
         assertMatch(userMeals, testMeals);
@@ -94,7 +97,10 @@ public class MealServiceTest {
     @Test
     public void getBetweenInclusiveWithNull() {
         List<Meal> userMeals = mealService.getBetweenInclusive(null, null, UserTestData.USER_ID);
-        List<Meal> testMeals = getUserMeals().stream()
+        List<Meal> testDataMeals = Arrays.asList(
+                userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1
+        );
+        List<Meal> testMeals = testDataMeals.stream()
                 .filter(meal -> Util.isBetweenHalfOpen(meal.getDate(), null, null))
                 .collect(Collectors.toList());
         assertMatch(userMeals, testMeals);
@@ -104,8 +110,14 @@ public class MealServiceTest {
     public void getAll() {
         List<Meal> userMeals = mealService.getAll(UserTestData.USER_ID);
         List<Meal> adminMeals = mealService.getAll(UserTestData.ADMIN_ID);
-        assertMatch(userMeals, getUserMeals());
-        assertMatch(adminMeals, getAdminMeals());
+        List<Meal> userTestMeals = Arrays.asList(
+                userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1
+        );
+        List<Meal> adminTestMeals = Arrays.asList(
+                adminMeal7, adminMeal6, adminMeal5, adminMeal4, adminMeal3, adminMeal2, adminMeal1
+        );
+        assertMatch(userMeals, userTestMeals);
+        assertMatch(adminMeals, adminTestMeals);
     }
 
     @Test
@@ -127,6 +139,12 @@ public class MealServiceTest {
         mealService.delete(userMeal1.getId(), UserTestData.USER_ID);
         assertThrows(NotFoundException.class, () ->
                 mealService.delete(userMeal1.getId(), UserTestData.USER_ID));
+    }
+
+    @Test
+    public void deleteNotFound() {
+        assertThrows(NotFoundException.class, () ->
+                mealService.delete(NON_EXISTENT_MEAL_ID, UserTestData.USER_ID));
     }
 
     @Test
