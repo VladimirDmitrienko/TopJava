@@ -11,16 +11,13 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.Util;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -70,14 +67,12 @@ public class MealServiceTest {
 
     @Test
     public void getNotFound() {
-        assertThrows(NotFoundException.class, () ->
-                mealService.get(NON_EXISTENT_MEAL_ID, UserTestData.USER_ID));
+        assertThrows(NotFoundException.class, () -> mealService.get(NON_EXISTENT_MEAL_ID, UserTestData.USER_ID));
     }
 
     @Test
     public void getNotOwn() {
-        assertThrows(NotFoundException.class, () ->
-                mealService.get(userMeal1.getId(), UserTestData.ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> mealService.get(userMeal1.getId(), UserTestData.ADMIN_ID));
     }
 
     @Test
@@ -85,24 +80,14 @@ public class MealServiceTest {
         LocalDate startDate = LocalDate.of(2019, Month.JANUARY, 30);
         LocalDate endDate = LocalDate.of(2020, Month.JANUARY, 30);
         List<Meal> userMeals = mealService.getBetweenInclusive(startDate, endDate, UserTestData.USER_ID);
-        List<Meal> testDataMeals = Arrays.asList(
-                userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1
-        );
-        List<Meal> testMeals = testDataMeals.stream()
-                .filter(meal -> Util.isBetweenHalfOpen(meal.getDate(), startDate, endDate.plus(1, ChronoUnit.DAYS)))
-                .collect(Collectors.toList());
+        List<Meal> testMeals = Arrays.asList(userMeal3, userMeal2, userMeal1);
         assertMatch(userMeals, testMeals);
     }
 
     @Test
     public void getBetweenInclusiveWithNull() {
         List<Meal> userMeals = mealService.getBetweenInclusive(null, null, UserTestData.USER_ID);
-        List<Meal> testDataMeals = Arrays.asList(
-                userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1
-        );
-        List<Meal> testMeals = testDataMeals.stream()
-                .filter(meal -> Util.isBetweenHalfOpen(meal.getDate(), null, null))
-                .collect(Collectors.toList());
+        List<Meal> testMeals = Arrays.asList(userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1);
         assertMatch(userMeals, testMeals);
     }
 
@@ -111,11 +96,9 @@ public class MealServiceTest {
         List<Meal> userMeals = mealService.getAll(UserTestData.USER_ID);
         List<Meal> adminMeals = mealService.getAll(UserTestData.ADMIN_ID);
         List<Meal> userTestMeals = Arrays.asList(
-                userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1
-        );
+                userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1);
         List<Meal> adminTestMeals = Arrays.asList(
-                adminMeal7, adminMeal6, adminMeal5, adminMeal4, adminMeal3, adminMeal2, adminMeal1
-        );
+                adminMeal7, adminMeal6, adminMeal5, adminMeal4, adminMeal3, adminMeal2, adminMeal1);
         assertMatch(userMeals, userTestMeals);
         assertMatch(adminMeals, adminTestMeals);
     }
@@ -130,26 +113,22 @@ public class MealServiceTest {
     @Test
     public void updateNotOwn() {
         Meal updated = getUpdated();
-        assertThrows(NotFoundException.class, () ->
-                mealService.update(updated, UserTestData.ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> mealService.update(updated, UserTestData.ADMIN_ID));
     }
 
     @Test
     public void delete() {
         mealService.delete(userMeal1.getId(), UserTestData.USER_ID);
-        assertThrows(NotFoundException.class, () ->
-                mealService.delete(userMeal1.getId(), UserTestData.USER_ID));
+        assertThrows(NotFoundException.class, () -> mealService.delete(userMeal1.getId(), UserTestData.USER_ID));
     }
 
     @Test
     public void deleteNotFound() {
-        assertThrows(NotFoundException.class, () ->
-                mealService.delete(NON_EXISTENT_MEAL_ID, UserTestData.USER_ID));
+        assertThrows(NotFoundException.class, () -> mealService.delete(NON_EXISTENT_MEAL_ID, UserTestData.USER_ID));
     }
 
     @Test
     public void deleteNotOwn() {
-        assertThrows(NotFoundException.class, () ->
-                mealService.delete(userMeal1.getId(), UserTestData.ADMIN_ID));
+        assertThrows(NotFoundException.class, () -> mealService.delete(userMeal1.getId(), UserTestData.ADMIN_ID));
     }
 }
