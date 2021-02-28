@@ -1,8 +1,9 @@
 package ru.javawebinar.topjava.service;
 
+import org.junit.AfterClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestWatcher;
+import org.junit.rules.Stopwatch;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -16,12 +17,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
-import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
@@ -37,43 +37,22 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 public class MealServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(MealServiceTest.class);
-
-    private static int testMethodCount;
-    private static final Map<String, Long> testMap = new HashMap<>();
-
-    static {
-        Class<MealServiceTest> clazz = MealServiceTest.class;
-        Method[] methods = clazz.getMethods();
-        for (Method method : methods) {
-            if (method.isAnnotationPresent(Test.class)) {
-                testMethodCount++;
-            }
-        }
-
-    }
-
-    private Date startDate;
+    private static final Map<String, Long> nameTimeMap = new LinkedHashMap<>();
 
     @Rule
-    public TestWatcher watcher = new TestWatcher() {
-
+    public Stopwatch stopwatch = new Stopwatch() {
         @Override
-        protected void starting(Description description) {
-            startDate = new Date();
-        }
-
-        @Override
-        protected void finished(Description description) {
-            Date endDate = new Date();
-            long executionTimeInMillis = endDate.getTime() - startDate.getTime();
-            log.info(String.valueOf(executionTimeInMillis));
-            testMap.put(description.getMethodName(), executionTimeInMillis);
-            testMethodCount--;
-            if (testMethodCount == 0) {
-                testMap.forEach((k, v) -> System.out.printf("Test name: %s, execution time: %s%n", k, v));
-            }
+        protected void finished(long nanos, Description description) {
+            long timeInMs = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
+            nameTimeMap.put(description.getMethodName(), timeInMs);
+            log.info("{} : {}ms", description.getMethodName(), timeInMs);
         }
     };
+
+    @AfterClass
+    public static void printTestNamesAndTime() {
+        nameTimeMap.forEach((name, time) -> log.info(String.format("%-25s : %sms", name, time)));
+    }
 
     @Autowired
     private MealService service;
