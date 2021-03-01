@@ -40,7 +40,7 @@ public class MealServiceTest {
     private static final Map<String, Long> nameTimeMap = new LinkedHashMap<>();
 
     @Rule
-    public Stopwatch stopwatch = new Stopwatch() {
+    public final Stopwatch stopwatch = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
             long timeInMs = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
@@ -49,13 +49,15 @@ public class MealServiceTest {
         }
     };
 
-    @AfterClass
-    public static void printTestNamesAndTime() {
-        nameTimeMap.forEach((name, time) -> log.info(String.format("%-25s : %sms", name, time)));
-    }
-
     @Autowired
     private MealService service;
+
+    @AfterClass
+    public static void printTestNamesAndTime() {
+        StringBuilder builder = new StringBuilder();
+        nameTimeMap.forEach((name, time) -> builder.append(String.format("\n%-25s : %sms", name, time)));
+        log.info(builder.toString());
+    }
 
     @Test
     public void delete() {
