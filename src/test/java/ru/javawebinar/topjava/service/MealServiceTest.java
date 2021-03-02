@@ -45,7 +45,7 @@ public class MealServiceTest {
         protected void finished(long nanos, Description description) {
             long timeInMs = TimeUnit.MILLISECONDS.convert(nanos, TimeUnit.NANOSECONDS);
             nameTimeMap.put(description.getMethodName(), timeInMs);
-            log.info("{} : {}ms", description.getMethodName(), timeInMs);
+            log.info("{} : {} ms", description.getMethodName(), timeInMs);
         }
     };
 
@@ -55,7 +55,7 @@ public class MealServiceTest {
     @AfterClass
     public static void printTestNamesAndTime() {
         StringBuilder builder = new StringBuilder();
-        nameTimeMap.forEach((name, time) -> builder.append(String.format("\n%-25s : %sms", name, time)));
+        nameTimeMap.forEach((name, time) -> builder.append(String.format("\n%-25s : %s ms", name, time)));
         log.info(builder.toString());
     }
 
