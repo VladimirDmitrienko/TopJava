@@ -4,5 +4,5 @@ import org.springframework.test.context.ActiveProfiles;
 
 
 @ActiveProfiles(profiles = {"postgres", "datajpa"})
-public class UserServiceTest extends AbstractUserServiceTest {
+public class MealServiceDataJpaTest extends AbstractMealServiceTest {
 }
