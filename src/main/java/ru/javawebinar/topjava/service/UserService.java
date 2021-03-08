@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.service;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.User;
@@ -14,7 +13,6 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFound;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
 @Service
-@Profile("dev")
 public class UserService {
 
     private final UserRepository repository;
@@ -39,7 +37,7 @@ public class UserService {
     }
 
     public User getWithMeals(int id) {
-        return repository.getWithMeals(id);
+        return checkNotFoundWithId(repository.getWithMeals(id), id);
     }
 
     @Cacheable("users")

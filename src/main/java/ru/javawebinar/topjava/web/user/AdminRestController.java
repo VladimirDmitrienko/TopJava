@@ -8,7 +8,6 @@ import ru.javawebinar.topjava.model.User;
 import java.util.List;
 
 @Controller
-@Profile("dev")
 public class AdminRestController extends AbstractUserController {
 
     @Override
