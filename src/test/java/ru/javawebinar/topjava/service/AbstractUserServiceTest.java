@@ -3,11 +3,15 @@ package ru.javawebinar.topjava.service;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.transaction.annotation.Transactional;
+import ru.javawebinar.topjava.MealTestData;
 import ru.javawebinar.topjava.UserTestData;
+import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
@@ -73,5 +77,12 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     public void getAll() {
         List<User> all = service.getAll();
         USER_MATCHER.assertMatch(all, admin, user);
+    }
+
+    @Test
+    public void getWithMeals() {
+        List<Meal> actualMeals = service.getWithMeals(admin.id()).getMeals();
+        List<Meal> expectedMeals = Arrays.asList(MealTestData.adminMeal2, MealTestData.adminMeal1);
+        MealTestData.MEAL_MATCHER.assertMatch(actualMeals, expectedMeals);
     }
 }

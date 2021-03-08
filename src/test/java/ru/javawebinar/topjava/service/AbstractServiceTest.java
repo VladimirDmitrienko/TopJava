@@ -23,7 +23,7 @@ import static org.slf4j.LoggerFactory.getLogger;
         "classpath:spring/spring-db.xml"
 })
 @RunWith(SpringRunner.class)
-@Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
+@Sql(scripts = {"classpath:db/initDB_hsql.sql", "classpath:db/populateDB.sql"}, config = @SqlConfig(encoding = "UTF-8"))
 public abstract class AbstractServiceTest {
 
     static final Logger log = getLogger("result");
