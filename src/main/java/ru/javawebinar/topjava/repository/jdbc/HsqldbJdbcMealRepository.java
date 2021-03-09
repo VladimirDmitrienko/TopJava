@@ -6,27 +6,23 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.util.Profiles;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-@Profile("hsqldb")
-public class HsqldbMealRepository extends AbstractJdbcMealRepository {
+@Profile(Profiles.HSQL_DB)
+public class HsqldbJdbcMealRepository extends AbstractJdbcMealRepository {
 
-    public HsqldbMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+    public HsqldbJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
     @Override
-    MapSqlParameterSource getMap(Meal meal, int userId) {
-        return new MapSqlParameterSource()
-                .addValue("id", meal.getId())
-                .addValue("description", meal.getDescription())
-                .addValue("calories", meal.getCalories())
-                .addValue("date_time", Timestamp.valueOf(meal.getDateTime()))
-                .addValue("user_id", userId);
+    void addDateTime(Meal meal, MapSqlParameterSource map) {
+        map.addValue("date_time", Timestamp.valueOf(meal.getDateTime()));
     }
 
     @Override

@@ -35,7 +35,12 @@ public abstract class AbstractJdbcMealRepository implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        MapSqlParameterSource map = getMap(meal, userId);
+        MapSqlParameterSource map = new MapSqlParameterSource()
+                .addValue("id", meal.getId())
+                .addValue("description", meal.getDescription())
+                .addValue("calories", meal.getCalories())
+                .addValue("user_id", userId);
+        addDateTime(meal, map);
         if (meal.isNew()) {
             Number newId = insertMeal.executeAndReturnKey(map);
             meal.setId(newId.intValue());
@@ -50,7 +55,7 @@ public abstract class AbstractJdbcMealRepository implements MealRepository {
         return meal;
     }
 
-    abstract MapSqlParameterSource getMap(Meal meal, int userId);
+    abstract void addDateTime(Meal meal, MapSqlParameterSource map);
 
     @Override
     public boolean delete(int id, int userId) {

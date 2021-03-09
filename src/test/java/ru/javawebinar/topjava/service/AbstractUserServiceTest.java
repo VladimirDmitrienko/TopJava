@@ -18,10 +18,10 @@ import static ru.javawebinar.topjava.UserTestData.*;
 public abstract class AbstractUserServiceTest extends AbstractServiceTest {
 
     @Autowired
-    UserService service;
+    protected UserService service;
 
     @Autowired
-    CacheManager cacheManager;
+    private CacheManager cacheManager;
 
     @Before
     public void setup() {

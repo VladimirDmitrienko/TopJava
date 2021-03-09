@@ -19,7 +19,7 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Autowired
-    MealService service;
+    protected MealService service;
 
     @Test
     public void delete() {

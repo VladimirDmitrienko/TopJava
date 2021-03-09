@@ -1,7 +1,5 @@
 package ru.javawebinar.topjava.web.user;
 
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import ru.javawebinar.topjava.model.User;
 
