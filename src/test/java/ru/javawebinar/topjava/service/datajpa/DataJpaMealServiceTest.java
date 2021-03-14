@@ -15,6 +15,7 @@ import static ru.javawebinar.topjava.UserTestData.admin;
 
 @ActiveProfiles(DATAJPA)
 public class DataJpaMealServiceTest extends AbstractMealServiceTest {
+
     @Test
     public void getWithUser() {
         Meal adminMeal = service.getWithUser(ADMIN_MEAL_ID, ADMIN_ID);
