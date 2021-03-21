@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.to.MealTo;
@@ -22,6 +23,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Controller
+@RequestMapping(value = "/meals")
 public class JspMealController {
 
     private final MealService mealService;
@@ -31,14 +33,14 @@ public class JspMealController {
         this.mealService = mealService;
     }
 
-    @GetMapping("/meals")
+    @GetMapping("/")
     public String meals(Model model) {
         int userId = SecurityUtil.authUserId();
         model.addAttribute("meals", MealsUtil.getTos(mealService.getAll(userId), SecurityUtil.authUserCaloriesPerDay()));
         return "meals";
     }
 
-    @GetMapping("/meals/filter")
+    @GetMapping("/filter")
     public String filter(HttpServletRequest request, Model model) {
         int userId = SecurityUtil.authUserId();
         LocalDate startDate = DateTimeUtil.parseLocalDate(request.getParameter("startDate"));
@@ -51,14 +53,14 @@ public class JspMealController {
         return "meals";
     }
 
-    @GetMapping("/meals/create")
+    @GetMapping("/create")
     public String create(Model model) {
         Meal meal = new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000);
         model.addAttribute("meal", meal);
         return "mealForm";
     }
 
-    @GetMapping("/meals/update/{id}")
+    @GetMapping("/update/{id}")
     public String update(@PathVariable int id, Model model) {
         int userId = SecurityUtil.authUserId();
         Meal meal = mealService.get(id, userId);
@@ -66,14 +68,14 @@ public class JspMealController {
         return "mealForm";
     }
 
-    @GetMapping("/meals/delete/{id}")
+    @GetMapping("/delete/{id}")
     public String delete(@PathVariable int id) {
         int userId = SecurityUtil.authUserId();
         mealService.delete(id, userId);
         return "redirect:/meals";
     }
 
-    @PostMapping("/meals")
+    @PostMapping("/")
     public String createOrUpdate(HttpServletRequest request) {
         int userId = SecurityUtil.authUserId();
         String id = request.getParameter("id");

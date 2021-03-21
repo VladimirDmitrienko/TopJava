@@ -9,7 +9,6 @@ import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.service.jdbc.JdbcMealServiceTest;
 import ru.javawebinar.topjava.service.jdbc.JdbcUserServiceTest;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
@@ -96,7 +95,7 @@ public abstract class AbstractUserServiceTest extends AbstractServiceTest {
     }
 
     @Test
-    public void createWithException() throws Exception {
+    public void createWithException() {
         Assume.assumeFalse(isJdbcUserServiceTestClass());
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "  ", "mail@yandex.ru", "password", Role.USER)));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new User(null, "User", "  ", "password", Role.USER)));
