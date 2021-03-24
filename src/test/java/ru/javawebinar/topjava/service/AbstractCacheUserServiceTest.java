@@ -7,7 +7,7 @@ import ru.javawebinar.topjava.repository.JpaUtil;
 public abstract class AbstractCacheUserServiceTest extends AbstractUserServiceTest {
 
     @Autowired
-    protected JpaUtil jpaUtil;
+    private JpaUtil jpaUtil;
 
     @Before
     @Override

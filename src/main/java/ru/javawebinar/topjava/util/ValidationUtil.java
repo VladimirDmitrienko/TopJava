@@ -6,7 +6,15 @@ import org.springframework.lang.NonNull;
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+
 public class ValidationUtil {
+
+    private static class Holder {
+        private static final Validator INSTANCE = Validation.buildDefaultValidatorFactory().getValidator();
+    }
+
     private ValidationUtil() {
     }
 
@@ -50,5 +58,9 @@ public class ValidationUtil {
     public static Throwable getRootCause(@NonNull Throwable t) {
         Throwable rootCause = NestedExceptionUtils.getRootCause(t);
         return rootCause != null ? rootCause : t;
+    }
+
+    public static Validator getValidator() {
+        return Holder.INSTANCE;
     }
 }
