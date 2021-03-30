@@ -17,6 +17,8 @@ import java.util.List;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.*;
+import static ru.javawebinar.topjava.util.MealsUtil.DEFAULT_CALORIES_PER_DAY;
+import static ru.javawebinar.topjava.util.MealsUtil.getTos;
 
 class MealRestControllerTest extends AbstractControllerTest {
 
@@ -53,7 +55,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void update() throws Exception {
         Meal updated = getUpdated();
-        perform(MockMvcRequestBuilders.put(REST_URL + "update/" + updated.getId())
+        perform(MockMvcRequestBuilders.put(REST_URL + updated.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(updated)))
                 .andExpect(status().isOk());
@@ -63,7 +65,7 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void create() throws Exception {
-        perform(MockMvcRequestBuilders.post(REST_URL + "create")
+        perform(MockMvcRequestBuilders.post(REST_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(getNew())))
                 .andExpect(status().isCreated());
@@ -73,5 +75,40 @@ class MealRestControllerTest extends AbstractControllerTest {
         expected.setId(ADMIN_MEAL_ID + 2);
 
         MEAL_MATCHER.assertMatch(actual, expected);
+    }
+
+    @Test
+    void getBetween() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter/")
+                .param("startDate", "2020-01-30")
+                .param("endDate", "2020-01-30")
+                .param("startTime", "10:00")
+                .param("endTime", "20:00"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MEAL_TO_MATCHER.contentJson(getTos(List.of(meal2, meal1), DEFAULT_CALORIES_PER_DAY)));
+    }
+
+//    HW7 2.2 implementation test
+//    @Test
+//    void getBetween() throws Exception {
+//        perform(MockMvcRequestBuilders.get(REST_URL + "filter/")
+//                .param("start", "2020-01-30T10:00")
+//                .param("end", "2020-01-30T20:00"))
+//                .andExpect(status().isOk())
+//                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+//                .andExpect(MEAL_TO_MATCHER.contentJson(getTos(List.of(meal2, meal1), DEFAULT_CALORIES_PER_DAY)));
+//    }
+
+    @Test
+    void getBetweenWithNull() throws Exception {
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter/")
+                .param("startDate", "")
+                .param("endDate", "")
+                .param("startTime", "")
+                .param("endTime", ""))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(MEAL_TO_MATCHER.contentJson(mealTos));
     }
 }
