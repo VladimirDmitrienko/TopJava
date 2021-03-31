@@ -23,7 +23,7 @@ public class UserTestData {
     public static final User adminWithMeals = new User(admin);
 
     static {
-        adminWithMeals.setMeals(Arrays.asList(adminMeal1, adminMeal2));
+        adminWithMeals.setMeals(Arrays.asList(adminMeal2, adminMeal1));
         userWithMeals.setMeals(meals);
     }
 
