@@ -3,7 +3,6 @@ package ru.javawebinar.topjava;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -24,7 +23,7 @@ public class UserTestData {
     public static final User adminWithMeals = new User(admin);
 
     static {
-        adminWithMeals.setMeals(new ArrayList<>(Arrays.asList(adminMeal1, adminMeal2)));
+        adminWithMeals.setMeals(Arrays.asList(adminMeal1, adminMeal2));
         userWithMeals.setMeals(meals);
     }
 

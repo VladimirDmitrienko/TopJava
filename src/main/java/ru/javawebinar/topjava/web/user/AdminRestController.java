@@ -31,7 +31,7 @@ public class AdminRestController extends AbstractUserController {
     @GetMapping("/{id}/with-meals")
     @ResponseStatus(HttpStatus.OK)
     public User getWithMeals(@PathVariable int id) {
-        return service.getWithMeals(id);
+        return super.getWithMeals(id);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

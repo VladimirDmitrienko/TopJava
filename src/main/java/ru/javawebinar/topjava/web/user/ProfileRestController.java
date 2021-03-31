@@ -33,7 +33,7 @@ public class ProfileRestController extends AbstractUserController {
     @GetMapping("/with-meals")
     @ResponseStatus(HttpStatus.OK)
     public User getWithMeals() {
-        return service.getWithMeals(SecurityUtil.authUserId());
+        return super.getWithMeals(SecurityUtil.authUserId());
     }
 
     @GetMapping("/text")

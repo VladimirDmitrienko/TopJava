@@ -1,8 +1,10 @@
 package ru.javawebinar.topjava.web.meal;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.javawebinar.topjava.model.Meal;
@@ -52,7 +54,7 @@ public class MealRestController extends AbstractMealController {
 
     @Override
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@RequestBody Meal meal, @PathVariable int id) {
         super.update(meal, id);
     }
@@ -67,12 +69,10 @@ public class MealRestController extends AbstractMealController {
 
     @GetMapping( "/filter")
     @ResponseStatus(HttpStatus.OK)
-    public List<MealTo> getFiltered(@RequestParam String startDate, @RequestParam String startTime,
-                                    @RequestParam String endDate, @RequestParam String endTime) {
-        LocalDate startLocalDate = DateTimeUtil.parseFormattedDate(startDate);
-        LocalDate endLocalDate = DateTimeUtil.parseFormattedDate(endDate);
-        LocalTime startLocalTime = DateTimeUtil.parseFormattedTime(startTime);
-        LocalTime endLocalTime = DateTimeUtil.parseFormattedTime(endTime);
-        return super.getBetween(startLocalDate, startLocalTime, endLocalDate, endLocalTime);
+    public List<MealTo> getFiltered(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable LocalDate startDate,
+                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @Nullable LocalTime startTime,
+                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable LocalDate endDate,
+                                    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) @Nullable LocalTime endTime) {
+        return super.getBetween(startDate, startTime, endDate, endTime);
     }
 }
