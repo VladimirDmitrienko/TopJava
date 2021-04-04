@@ -45,3 +45,15 @@ $(function () {
         })
     );
 });
+
+function enableUser(id, enable) {
+    $.ajaxSetup({cache: true});
+    $.ajax({
+        type: 'GET',
+        url: ctx.ajaxUrl + 'enable',
+        data: {id, enable}
+    }).done(function (data) {
+        updateTable(data);
+        successNoty("Updated");
+    });
+}

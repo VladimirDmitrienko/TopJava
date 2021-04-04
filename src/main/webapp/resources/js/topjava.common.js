@@ -10,6 +10,11 @@ function makeEditable(datatableApi) {
         }
     });
 
+    $('input[name="enabled"]').change(function () {
+        const id = $(this).closest('tr').attr("id");
+        $(this).is(':checked') ? enableUser(id, true) : enableUser(id, false)
+    })
+
     $(document).ajaxError(function (event, jqXHR, options, jsExc) {
         failNoty(jqXHR);
     });
@@ -34,9 +39,27 @@ function deleteRow(id) {
 }
 
 function updateTable() {
-    $.get(ctx.ajaxUrl, function (data) {
-        ctx.datatableApi.clear().rows.add(data).draw();
-    });
+    if (useFilter()) {
+        filter()
+    }
+    else {
+        $.ajaxSetup({cache: true});
+        $.get(ctx.ajaxUrl, function (data) {
+            ctx.datatableApi.clear().rows.add(data).draw();
+        });
+    }
+}
+
+function useFilter() {
+    const dateTimeForm = $('#dateTimeForm')
+    if (dateTimeForm.length > 0) {
+        const inputs = dateTimeForm.find(':input')
+        for (const input of inputs) {
+            if (!(input.value === "")) {
+                return true;
+            }
+        }
+    }
 }
 
 function save() {
