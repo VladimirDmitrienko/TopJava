@@ -25,6 +25,7 @@ function enable(chkbox, id) {
 
 // $(document).ready(function () {
 $(function () {
+    $.ajaxSetup({ cache: true});
     makeEditable(
         $("#datatable").DataTable({
             "ajax": {
