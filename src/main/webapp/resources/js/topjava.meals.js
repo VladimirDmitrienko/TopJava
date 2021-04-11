@@ -30,7 +30,7 @@ $(function () {
                 {
                     "data": "dateTime",
                     "render": function (data, type, row) {
-                        return data.toString().replace('T', ' ').substring(0, 16)
+                        return formatDateTime(data)
                     }
                 },
                 {
@@ -62,3 +62,23 @@ $(function () {
         })
     );
 });
+
+function datePicker(input) {
+    $(input).datetimepicker({
+        timepicker: false,
+        format: 'Y-m-d'
+    }).focus()
+}
+
+function timePicker(input) {
+    $(input).datetimepicker({
+        datepicker: false,
+        format: 'H:i'
+    }).focus()
+}
+
+function dateTimePicker(input) {
+    $(input).datetimepicker( {
+        format: 'Y-m-d H:i'
+    }).focus()
+}
